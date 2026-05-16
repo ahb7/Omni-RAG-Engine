@@ -27,5 +27,5 @@ Follow these steps to set up and run the application locally inside your environ
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/YOUR_USERNAME/omni-rag-engine.git](https://github.com/YOUR_USERNAME/omni-rag-engine.git)
-cd omni-rag-engine
+git clone [https://github.com/ahb7/Omni-RAG-Engine.git](https://github.com/ahb7/Omni-RAG-Engine.git)
+cd Omni-RAG-Engine
