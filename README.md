@@ -26,7 +26,6 @@ A lightweight, local Retrieval-Augmented Generation (RAG) engine built with Fast
 Follow these steps to set up and run the application locally inside your environment (e.g., WSL Ubuntu or Linux).
 
 ### 1. Clone the Repository
-```bash
 git clone [https://github.com/ahb7/Omni-RAG-Engine.git](https://github.com/ahb7/Omni-RAG-Engine.git)
 cd Omni-RAG-Engine
 
