@@ -29,3 +29,22 @@ Follow these steps to set up and run the application locally inside your environ
 ```bash
 git clone [https://github.com/ahb7/Omni-RAG-Engine.git](https://github.com/ahb7/Omni-RAG-Engine.git)
 cd Omni-RAG-Engine
+
+### 2. Set Up a Virtual Environment
+python3 -m venv venv
+source venv/bin/activate
+
+### 3. Install Dependencies
+pip install --upgrade pip
+pip install -r requirements.txt
+
+### 4. Configure Environment Variables
+Create a .env file in the root directory of the project and add your Groq API key:
+GROQ_API_KEY=your_actual_groq_api_key_here
+
+### Running the Application
+Start the local Uvicorn development server:
+uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
+
+Once the server completes initialization, open your web browser and navigate to:
+[http://127.0.0.1:8000](http://127.0.0.1:8000)
