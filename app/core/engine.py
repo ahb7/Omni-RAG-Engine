@@ -1,7 +1,7 @@
 import os
 from operator import itemgetter
 from langchain_groq import ChatGroq
-from langchain_huggingface import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEndpointEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.runnables import RunnablePassthrough, RunnableLambda
@@ -18,9 +18,10 @@ def format_docs(docs):
 
 class RAGEngine:
     def __init__(self):
-        # Local embeddings for technical data privacy
-        self.embeddings = HuggingFaceEmbeddings(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
+        # This sends an API network request instead of running locally (Uses almost 0 RAM)
+        self.embeddings = HuggingFaceEndpointEmbeddings(
+            huggingfacehub_api_token=os.getenv("HF_TOKEN"),
+            model="sentence-transformers/all-MiniLM-L6-v2"
         )
         
         # High-performance inference via Groq
