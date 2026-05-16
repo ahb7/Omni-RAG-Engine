@@ -1,0 +1,24 @@
+# Virtual Environment
+venv/
+.venv/
+__pycache__/
+*.pyc
+
+# Local Vector Databases & Temporary Files
+vector_store/
+extracted_images/
+temp_*
+*.pdf
+
+# Environment Secrets
+.env
+
+# Ignore versioned backup files
+*_ver1.*
+*_ver2.*
+*_ver3.*
+
+# Ignore extracted figures/images directories
+figures/
+extracted_images/
+

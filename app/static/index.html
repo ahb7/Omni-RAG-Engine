@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Omni-RAG Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .chat-container { height: 60vh; }
+        .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #4b5563; border-radius: 10px; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen flex flex-col items-center p-4">
+
+    <!-- Header -->
+    <header class="w-full max-w-4xl text-center py-8">
+        <h1 class="text-4xl font-bold text-blue-400 mb-2">Omni-RAG Engine</h1>
+        <p class="text-gray-400">AI/ML Powered Document Intelligence</p>
+    </header>
+
+    <main class="w-full max-w-4xl grid grid-cols-1 md:grid-cols-3 gap-6">
+        
+        <!-- Left Panel: Controls -->
+        <div class="md:col-span-1 space-y-6">
+            <div class="bg-gray-800 p-6 rounded-xl shadow-lg border border-gray-700">
+                <h2 class="text-lg font-semibold mb-4">1. Upload Knowledge</h2>
+                <input type="file" id="pdfFile" accept=".pdf" class="block w-full text-sm text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-blue-600 file:text-white hover:file:bg-blue-700 cursor-pointer"/>
+                <button onclick="uploadPDF()" id="uploadBtn" class="w-full mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-200">
+                    Ingest PDF
+                </button>
+                <p id="uploadStatus" class="mt-2 text-xs text-center"></p>
+            </div>
+        </div>
+
+        <!-- Right Panel: Chat Interface -->
+        <div class="md:col-span-2 bg-gray-800 rounded-xl shadow-lg border border-gray-700 flex flex-col">
+            <div id="chatBox" class="chat-container custom-scrollbar overflow-y-auto p-6 space-y-4">
+                <div class="bg-blue-900/30 border border-blue-800 p-3 rounded-lg text-sm">
+                    👋 <b>Omni-RAG Online.</b> Please upload a PDF to begin document-grounded chat.
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="p-4 border-t border-gray-700 bg-gray-800/50 rounded-b-xl">
+                <div class="flex gap-2">
+                    <input type="text" id="userInput" placeholder="Ask a question..." class="flex-1 bg-gray-900 border border-gray-700 rounded-lg px-4 py-2 focus:outline-none focus:border-blue-500"/>
+                    <button onclick="sendMessage()" class="bg-green-600 hover:bg-green-700 px-6 py-2 rounded-lg font-bold transition">Send</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+    const API_BASE = window.location.origin;
+    let chatHistory = [];
+
+    async function uploadPDF() {
+        const fileInput = document.getElementById('pdfFile');
+        const status = document.getElementById('uploadStatus');
+        const btn = document.getElementById('uploadBtn');
+
+        if (!fileInput.files[0]) return alert("Select a PDF first!");
+
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        status.innerText = "⏳ Ingesting & Vectorizing...";
+        btn.disabled = true;
+
+        try {
+            const response = await fetch(`${API_BASE}/upload`, {
+                method: 'POST',
+                body: formData
+            });
+
+            // Renamed to 'uploadData' to avoid SyntaxError
+            const uploadData = await response.json();
+
+            status.className = "mt-2 text-xs text-green-400";
+            status.innerText = `✅ Success! Processed ${uploadData.chunks} chunks.`;
+
+            // Clear history for the new document
+            chatHistory = [];
+        } catch (err) {
+            status.className = "mt-2 text-xs text-red-400";
+            status.innerText = "❌ Upload failed. Check server logs.";
+        } finally {
+            btn.disabled = false;
+        }
+    }
+
+    async function sendMessage() {
+        const input = document.getElementById('userInput');
+        const chatBox = document.getElementById('chatBox');
+        const query = input.value.trim();
+
+        if (!query) return;
+
+        // Append User Message
+        chatBox.innerHTML += `<div class="text-right"><span class="bg-blue-600 px-4 py-2 rounded-2xl inline-block max-w-[80%]">${query}</span></div>`;
+        input.value = "";
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            const response = await fetch(`${API_BASE}/chat`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    query: query,
+                    history: chatHistory
+                })
+            });
+
+            // Renamed to 'chatData' to avoid SyntaxError
+            const chatData = await response.json();
+
+            if (chatData.answer) {
+                // Update Local History
+                chatHistory.push({ role: "user", content: query });
+                chatHistory.push({ role: "assistant", content: chatData.answer });
+                if (chatHistory.length > 10) chatHistory.shift();
+
+                // Append AI Message
+                chatBox.innerHTML += `<div class="text-left"><span class="bg-gray-700 px-4 py-2 rounded-2xl inline-block max-w-[80%] border border-gray-600">${chatData.answer}</span></div>`;
+            }
+        } catch (err) {
+            chatBox.innerHTML += `<div class="text-center text-red-500 text-xs">Error connecting to engine.</div>`;
+        }
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    document.getElementById('userInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
+</script>
+</body>
+</html>
+
+
