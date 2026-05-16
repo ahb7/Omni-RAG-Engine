@@ -42,8 +42,8 @@ Create a .env file in the root directory of the project and add your Groq API ke
 GROQ_API_KEY=your_actual_groq_api_key_here
 
 ### Running the Application
-Start the local Uvicorn development server:
+Start the local Uvicorn development server:   
 uvicorn app.main:app --host 127.0.0.1 --port 8000 --reload
 
-Once the server completes initialization, open your web browser and navigate to:
+Once the server completes initialization, open your web browser and navigate to:   
 [http://127.0.0.1:8000](http://127.0.0.1:8000)
